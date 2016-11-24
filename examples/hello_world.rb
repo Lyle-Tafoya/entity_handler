@@ -2,7 +2,7 @@ require_relative 'systems/graphics_ncurses'
 
 begin
   graphics_system = EntityHandler::GraphicsNcurses.new()
-  sleep(5)
+  sleep(2)
 ensure
-  graphics_system.shutdown()
+  EntityHandler::System.broadcast_message({'type_id'=>'shutdown'})
 end

@@ -10,7 +10,7 @@ Gem::Specification.new do |spec|
   spec.email         = ["lyle.tafoya@gmail.com"]
 
   spec.summary       = %q{A component based engine for working with systems comprised of entities}
-  spec.homepage      = ""
+  spec.homepage      = "https://github.com/lyle-tafoya/entity_handler"
 
   # Prevent pushing this gem to RubyGems.org. To allow pushes either set the 'allowed_push_host'
   # to allow pushing to a single host or delete this section to allow pushing to any host.
@@ -31,6 +31,6 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "bundler", "~> 1.13"
   spec.add_development_dependency "rake", "~> 10.0"
   spec.add_development_dependency "rspec", "~> 3.0"
+  spec.add_development_dependency "yard"
 
-  spec.metadata["yard.run"] = "yri"
 end

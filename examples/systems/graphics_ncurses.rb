@@ -15,11 +15,14 @@ module EntityHandler
       Ncurses.curs_set(0)
       Ncurses.mvaddstr(5, 5, 'Hello World')
       Ncurses.refresh()
+
+      System.register_callback('shutdown', self.method(:shutdown))
     end
 
-    def shutdown()
+    def shutdown(message)
       Ncurses.endwin()
     end
+
   end
 
 end

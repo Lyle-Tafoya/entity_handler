@@ -1,44 +1,82 @@
-
-
-
-# Overview -
-#
-# The Engine is comprised of systems. Each system is comprised of entities. Each entity is comprised of components.
-# A Component is represented by key value pairs. This implementation will use maps to work with the data in memory.
-# An Entity are represented by an id key value pair inside one or more Component maps. The Entity id can be passed between systems.
-# Systems are classes capable of sending and receiving messages. They manage components.
-
 require "entity_handler/version"
 
+# The EntityHandler module will contain all classes needed to begin developing simulation software
 module EntityHandler
 
+  # A system is generic class which defines a standardized method of communication.
+  # Systems communicate by broadcasting messages consisting of key-value pairs. 
+  # A type_id is an identifier used to index an array or map to trigger a callback function to handle the message.
+  #
   # @author Lyle Tafoya
   class System
-    @callbacks = {}
-    @entities = {}
-    @entity_types = {}
 
-    def initialize()
+    # A map where the key is message type_id and value is array of System callback methods
+    @@callback_registry = {}
+
+    # Map consisting of entities and the components of which they are comprised.
+    # Used as templates for creating new entities
+    @@entities = {}
+
+    # Map where keys are a component identifier and values are Maps representing the component data. 
+    # Used as templates for creating new components
+    @@components = {}
+
+    # Register a callback method to be run when a particular type of message is broadcasted
+    # 
+    # @param type_id [Integer]
+    # @param callback [Method]
+    def self.register_callback(type_id, callback)
+      @@callback_registry[type_id] = [] unless @@callback_registry.key?(type_id)
+      @@callback_registry[type_id].push(callback)
     end
 
-
-    def recieve_message(message)
-      message_type = message['type_id']
-      return unless @callbacks.key?(message_type)
-      @callbacks[message_type].call()
+    # Run all callback methods registered for the message type_id
+    #
+    # @param message [Hash]
+    def self.broadcast_message(message)
+      @@callback_registry[message['type_id']].each {|callback| callback.call(message) }
     end
 
-    def update(delta)
+    # Listen for incoming messages over the network on a particular port
+    #
+    # @param port [Integer]
+    def self.listen(port)
     end
 
-    # Static members
-    @@registry = {}
+    # Scan a directory and load all components into memory
+    #
+    # @param directory_path [String]
+    def self.load_components(directory_path)
+    end
 
-    @@update_queue = []
-    def self.update_systems(delta)
-      @@update_queue.each do |system|
-        system.update(delta)
-      end
+    # Clear the components map
+    def self.unload_components()
+      @@components = {}
+    end
+
+    # Remove a component from the components map
+    #
+    # @param component [String]
+    def self.unload_component(component)
+      @@components.delete(component) if @@components.key?(component)
+    end
+
+    # Scan a directory and load all entities into memory
+    #
+    # @param directory_path [String]
+    def self.load_entities(directory_path)
+    end
+
+    # Clear the entities map
+    def self.unload_entities()
+      @@entities = {}
+    end
+
+    # Remove an entity from the entity map
+    #
+    # @param entity [String]
+    def self.unload_entity(entity)
+      @@entities.delee(entity) if @@entities.key?(entity)
     end
 
   end

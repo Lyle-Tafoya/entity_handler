@@ -12,15 +12,21 @@ module EntityHandler
   class System
 
     # Map where keys are message type_ids and values are arrays of System callback methods
-    @@callback_registry = {}
+    @@callback_registry = Hash.new()
+
+    # Map where keys are component names and values are arrays of System objects
+    @@component_registry = Hash.new()
 
     # Map where keys are entity names and values are names of the components of which they are comprised.
     # Used as templates for creating new entities
-    @@entities = {}
+    @@entities = Hash.new()
+
+    # A class which generates ids
+    @@entity_id_generator = EntityHandler::Id.new()
 
     # Map where keys are component identifiers and values are Maps representing the component data. 
     # Used as templates for creating new components
-    @@components = {}
+    @@components = Hash.new()
 
     # Register a callback method to be run when a particular type of message is broadcasted
     # @param type_id [Integer]
@@ -32,8 +38,10 @@ module EntityHandler
 
     # Run all callback methods registered for the message type_id
     # @param message [Hash]
-    def self.broadcast_message(message)
-      @@callback_registry[message['type_id']].each {|callback| callback.call(message) }
+    def self.message_broadcast(message)
+      @@callback_registry[message['type_id']].each do |callback|
+        callback.call(message)
+      end
     end
 
     # Listen for incoming messages over the network on a particular port
@@ -43,7 +51,7 @@ module EntityHandler
 
     # Scan a directory and load all components into memory
     # @param directory_path [String]
-    def self.load_components(directory_path)
+    def self.components_load(directory_path)
       Dir.foreach(directory_path) do |filename|
         next unless filename.include?('.json')
         component_name = filename.split(/\.json$/)
@@ -52,19 +60,39 @@ module EntityHandler
     end
 
     # Clear the components map
-    def self.unload_components()
+    def self.components_unload()
       @@components = {}
     end
 
     # Remove a component from the components map
-    # @param component [String]
-    def self.unload_component(component)
-      @@components.delete(component) if @@components.key?(component)
+    # @param component_name [String]
+    def self.component_unload(component_name)
+      @@components.delete(component_name) if @@components.key?(component_name)
+    end
+
+    # Create a new component
+    # @param component_name [String]
+    # @param entity_id [Integer]
+    def self.component_create(component_name, entity_id)
+      new_component = @@components[component_name]
+      new_component['entity_id'] = entity_id
+      @@component_registry[component_name].each do |system|
+        system.component_add(component_name, new_component)
+      end
+    end
+
+    # Remove a component from all systems
+    # @param component_name [String]
+    # @param entity_id [Integer]
+    def self.component_delete(component_name, entity_id)
+      @@component_registry[component_name].each do |system|
+        system.component_remove(component_name, entity_id)
+      end
     end
 
     # Scan a directory and load all entities into memory
     # @param directory_path [String]
-    def self.load_entities(directory_path)
+    def self.entities_load(directory_path)
       Dir.foreach(directory_path) do |filename|
         next unless filename.include?('.json')
         entity_name = filename.split(/\.json$/)
@@ -81,6 +109,68 @@ module EntityHandler
     # @param entity [String]
     def self.unload_entity(entity)
       @@entities.delete(entity) if @@entities.key?(entity)
+    end
+
+    # Create a new entity
+    # @param entity_name [String]
+    def self.create_entity(entity_name)
+      entity_id = @@entity_id_generator.generate()
+      @@entities[entity_name]['components'].each do |component_name|
+        System.component_create(component_name, entity_id)
+      end
+    end
+    
+    # Remove an entity from all systems
+    # @param entity_id [Integer]
+    def self.entity_delete(entity_id)
+      System.message_broadcast({
+        'type_id'=>'delete_entity',
+        'entity_id'=>entity_id
+      })
+      @@entity_id_generator.delete(entity_id)
+    end
+
+    # Hash where keys are entity_ids and values are component maps
+    @entities = Hash.new()
+
+    # Set containing all valid components to be managed by this system
+    @valid_components = Set.new()
+
+    # Create a new system
+    def initialize()
+      @valid_components.each do |component_name|
+        unless @@component_registry.key?(component_name)
+          @@component_registry[component_name] = []
+        end
+        @@component_registry[component_name].push(self)
+      end
+      System.register_callback('entity_delete', self.method(:entity_delete))
+      System.register_callback('component_remove', self.method(:component_remove))
+    end
+
+    # Delete entity and all it's components
+    def entity_delete(message)
+      entity_id = message['entity_id']
+      if @entities.key?(entity_id)
+        @entities.delete(entity_id)
+      end
+    end
+
+    # Add a component to an entity
+    # @param component_name [String]
+    # @param component [Map]
+    def component_add(component_name, component)
+      entity_id = component['entity_id']
+      unless @entities.key?(entity_id)
+        @entities[entity_id] = {}
+      end
+      @entities[entity_id][component_name] = component
+    end
+
+    # Remove a component from an entity
+    # @param message [Map]
+    def component_remove(message)
+      @entities[message['entity_id']].delete(message['component_name'])
     end
 
   end

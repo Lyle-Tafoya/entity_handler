@@ -6,7 +6,12 @@ require "ncurses"
 module EntityHandler
 
   class GraphicsNcurses < System
-    @screen
+
+    @screen = nil
+
+    @valid_components = [
+      'location'
+    ]
 
     def initialize()
       @screen = Ncurses.initscr()

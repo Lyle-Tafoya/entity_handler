@@ -6,18 +6,20 @@ module EntityHandler
   #
   # @author Lyle Tafoya
   class Id
-    @available_ids = Set.new()
+
+    # Unused ids ready to be assigned
+    @available_ids = []
+
+    # Ids currently in use
     @used_ids = Set.new()
-    num_ids = 0
 
     # Generate a new id. If there are old unused ids, use one of them first
+    # @return [Integer]
     def generate()
       if @available_ids.size() > 0
-        new_id = @available_ids.first()
-        @available_ids.delete(new_id)
+        new_id = @available_ids.pop()
       else
-        new_id = @@num_ids
-        @@num_ids += 1
+        new_id = @used_ids.size()
       end
       return new_id
     end

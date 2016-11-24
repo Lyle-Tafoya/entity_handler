@@ -134,7 +134,7 @@ module EntityHandler
     @entities = Hash.new()
 
     # Set containing all valid components to be managed by this system
-    @valid_components = Set.new()
+    @valid_components = []
 
     # Create a new system
     def initialize()

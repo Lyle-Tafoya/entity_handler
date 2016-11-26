@@ -10,16 +10,22 @@ module EntityHandler
     @screen = nil
 
     def initialize()
-      super()
       @screen = Ncurses.initscr()
       Ncurses.noecho()
       Ncurses.keypad(@screen, true)
       Ncurses.curs_set(0)
-      Ncurses.mvaddstr(5, 5, 'Hello World')
       Ncurses.refresh()
 
-      System.callback_register('shutdown', self.method(:shutdown))
       self.components_register(['location'])
+      System.callback_register('shutdown', self.method(:shutdown))
+      System.callback_register('time_passed', self.method(:update))
+    end
+
+    def update(message)
+      @entities.each do |entity_id, entity_data|
+        Ncurses.mvaddstr(entity_data['location']['values']['y'], entity_data['location']['values']['x'], 'Hello World')
+      end
+      Ncurses.update()
     end
 
     def shutdown(message)

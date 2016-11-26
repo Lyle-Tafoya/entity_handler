@@ -5,7 +5,7 @@ require "ncurses"
 
 module EntityHandler
 
-  class GraphicsNcurses < System
+  class InputNcurses < System
     @screen
 
     def initialize()
@@ -13,12 +13,9 @@ module EntityHandler
       Ncurses.noecho()
       Ncurses.keypad(@screen, true)
       Ncurses.curs_set(0)
-      Ncurses.mvaddstr(5, 5, 'Hello World')
-      Ncurses.refresh()
     end
 
     def shutdown()
-      Ncurses.endwin()
     end
   end
 

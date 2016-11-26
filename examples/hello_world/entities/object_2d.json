@@ -1,6 +1,5 @@
 {
   "components": [
-    "dimension_x",
-    "dimension_y"
+    "location"
   ]
 }

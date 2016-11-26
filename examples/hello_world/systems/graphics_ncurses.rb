@@ -25,7 +25,7 @@ module EntityHandler
       @entities.each do |entity_id, entity_data|
         Ncurses.mvaddstr(entity_data['location']['values']['y'], entity_data['location']['values']['x'], 'Hello World')
       end
-      Ncurses.update()
+      Ncurses.refresh()
     end
 
     def shutdown(message)

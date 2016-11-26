@@ -9,11 +9,8 @@ module EntityHandler
 
     @screen = nil
 
-    @valid_components = [
-      'location'
-    ]
-
     def initialize()
+      super()
       @screen = Ncurses.initscr()
       Ncurses.noecho()
       Ncurses.keypad(@screen, true)
@@ -21,7 +18,8 @@ module EntityHandler
       Ncurses.mvaddstr(5, 5, 'Hello World')
       Ncurses.refresh()
 
-      System.register_callback('shutdown', self.method(:shutdown))
+      System.callback_register('shutdown', self.method(:shutdown))
+      self.components_register(['location'])
     end
 
     def shutdown(message)

@@ -1,0 +1,7 @@
+{
+  "components": [
+    "location",
+    "sprite_ncurses",
+    "velocity"
+  ]
+}

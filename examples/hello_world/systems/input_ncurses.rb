@@ -15,7 +15,12 @@ module EntityHandler
       Ncurses.curs_set(0)
     end
 
-    def shutdown()
+    def update(message)
+      Ncurses.getch()
+    end
+
+    def shutdown(message)
+      Ncurses.endwin()
     end
   end
 

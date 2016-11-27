@@ -52,7 +52,7 @@ module EntityHandler
     # @param component_name [String]
     # @param entity_id [Integer]
     def self.component_create(component_name, entity_id)
-      new_component = @@component_templates[component_name]
+      new_component = @@component_templates[component_name].dup()
       new_component['entity_id'] = entity_id
       @@component_registry[component_name].each do |system|
         system.component_add(component_name, new_component)

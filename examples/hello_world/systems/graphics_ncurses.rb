@@ -10,22 +10,29 @@ module EntityHandler
     @screen = nil
 
     def initialize()
-      @screen = Ncurses.initscr()
-      Ncurses.noecho()
-      Ncurses.keypad(@screen, true)
-      Ncurses.curs_set(0)
-      Ncurses.refresh()
-
-      self.components_register(['location'])
+      self.components_register(['location', 'sprite_ncurses'])
       System.callback_register('shutdown', self.method(:shutdown))
+      System.callback_register('sprite_update', self.method(:sprite_update))
       System.callback_register('time_passed', self.method(:update))
+
+      @screen = Ncurses.initscr()
+      Ncurses.curs_set(0)
+    end
+
+    def sprite_update(message)
+      @entities[message['entity_id']]['sprite_ncurses']['string'] = message['string']
     end
 
     def update(message)
-      @entities.each do |entity_id, entity_data|
-        Ncurses.mvaddstr(entity_data['location']['values']['y'], entity_data['location']['values']['x'], 'Hello World')
+      @entities.each do |entity_id, components|
+        location = components['location']
+        Ncurses.mvwaddstr(@screen, location['y'].to_i(), location['x'].to_i(), components['sprite_ncurses']['string'])
       end
-      Ncurses.refresh()
+      Ncurses.wrefresh(@screen)
+      @entities.each do |entity_id, components|
+        location = components['location']
+        Ncurses.mvwaddstr(@screen, location['y'].to_i(), location['x'].to_i(), ' '*components['sprite_ncurses']['string'].size())
+      end
     end
 
     def shutdown(message)

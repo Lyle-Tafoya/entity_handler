@@ -23,7 +23,6 @@ module EntityHandler
       @window.make_context_current()
       Glfw.swap_interval = 1
       window_size = @window.size()
-      Gl.glScalef(0.5, 0.5, 0.5)
       Gl.glViewport(0, 0, window_size.first(), window_size.last())
       Gl.glEnable(Gl::GL_DEPTH_TEST)
       Gl.glDepthFunc(Gl::GL_LESS)
@@ -48,30 +47,28 @@ module EntityHandler
     end
 
     def update(message)
-
-      @angle = 0 unless @angle
+      Gl.glLoadIdentity()
+      Gl.glScalef(0.3, 0.3, 0.3)
       Gl.glClear(Gl::GL_COLOR_BUFFER_BIT | Gl::GL_DEPTH_BUFFER_BIT)
-      Gl.glPushMatrix()
+      Gl.glColor3f(1, 1, 1)
       @entities.each do |entity_id, components|
+        Gl.glPushMatrix()
         location = components['location']
+        Gl.glRotatef(location['pitch'], 1, 0, 0)
+        Gl.glRotatef(location['yaw'], 0, 1, 0)
+        Gl.glRotatef(location['roll'], 0, 0, 1)
         x = location['x']; y = location['y']; z = location['z']
         components['model_3d']['model_data']['meshes'].each do |mesh|
-          Gl.glRotatef(@angle, 1, 0, 0)
-          Gl.glRotatef(@angle, 0, 1, 0)
           Gl.glBegin(Gl::GL_TRIANGLES)
           mesh['vertices'].each_slice(3) do |triangle|
-            srand(triangle.hash())
-            shade = rand()
-            Gl.glColor3f(shade, shade, shade)
             triangle.each do |vertice|
               Gl.glVertex3f(vertice['x']+x, vertice['y']+y, vertice['z']+z)
             end
           end
           Gl.glEnd()
         end
+        Gl.glPopMatrix()
       end
-      Gl.glPopMatrix()
-      @angle += 1
 
       @window.swap_buffers()
     end

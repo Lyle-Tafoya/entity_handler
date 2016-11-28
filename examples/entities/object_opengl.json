@@ -2,6 +2,7 @@
   "components": [
     "location",
     "model_3d",
-    "velocity"
+    "velocity",
+    "torque"
   ]
 }

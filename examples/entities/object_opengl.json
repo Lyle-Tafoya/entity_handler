@@ -1,0 +1,7 @@
+{
+  "components": [
+    "location",
+    "model_3d",
+    "velocity"
+  ]
+}

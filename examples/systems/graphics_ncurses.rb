@@ -12,7 +12,7 @@ module EntityHandler
     def initialize()
       self.components_register(['position', 'scene_ncurses'])
       System.callback_register('shutdown', self.method(:shutdown))
-      System.callback_register('scene_update', self.method(:sprite_update))
+      System.callback_register('scene_update', self.method(:scene_update))
       System.callback_register('time_passed', self.method(:update))
 
       @screen = Ncurses.initscr()
@@ -26,12 +26,12 @@ module EntityHandler
     def update(message)
       @entities.each do |entity_id, components|
         position = components['position']
-        Ncurses.mvwaddstr(@screen, position['y'].to_i(), position['x'].to_i(), components['sprite_ncurses']['string'])
+        Ncurses.mvwaddstr(@screen, position['y'].to_i(), position['x'].to_i(), components['scene_ncurses']['string'])
       end
       Ncurses.wrefresh(@screen)
       @entities.each do |entity_id, components|
         position = components['position']
-        Ncurses.mvwaddstr(@screen, position['y'].to_i(), position['x'].to_i(), ' '*components['sprite_ncurses']['string'].size())
+        Ncurses.mvwaddstr(@screen, position['y'].to_i(), position['x'].to_i(), ' '*components['scene_ncurses']['string'].size())
       end
     end
 

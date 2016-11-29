@@ -13,7 +13,7 @@ module EntityHandler
     @window = nil
     @model_registry = Hash.new()
 
-    def initialize(width:500, height:500, title:'EntityHandler::GraphicsOpenGL')
+    def initialize(width:640, height:480, title:'EntityHandler::GraphicsOpenGL')
       self.components_register(['orientation', 'position', 'scene_3d'])
       System.callback_register('shutdown', self.method(:shutdown))
       System.callback_register('time_passed', self.method(:update))
@@ -62,22 +62,23 @@ module EntityHandler
       Gl.glClear(Gl::GL_COLOR_BUFFER_BIT | Gl::GL_DEPTH_BUFFER_BIT)
       @entities.each do |entity_id, components|
         Gl.glPushMatrix()
-        orientation = components['orientation']
-        Gl.glRotatef(orientation['pitch'], 1, 0, 0)
-        Gl.glRotatef(orientation['yaw'], 0, 1, 0)
-        Gl.glRotatef(orientation['roll'], 0, 0, 1)
-        position = components['position']
-        x = position['x']; y = position['y']; z = position['z']
-        components['scene_3d']['model_data']['meshes'].each do |mesh|
-          Gl.glBegin(Gl::GL_TRIANGLES)
-          mesh['vertices'].each do |vertice|
-            srand(vertice.hash)
-            shade = rand()
-            Gl.glColor3f(shade, shade, shade)
-            Gl.glVertex3f(vertice['x']+x, vertice['y']+y, vertice['z']+z)
+          orientation = components['orientation']
+          Gl.glRotatef(orientation['pitch'], 1, 0, 0)
+          Gl.glRotatef(orientation['yaw'], 0, 1, 0)
+          Gl.glRotatef(orientation['roll'], 0, 0, 1)
+          position = components['position']
+          Gl.glTranslatef(position['x'], position['y'], position['z'])
+
+          components['scene_3d']['model_data']['meshes'].each do |mesh|
+            Gl.glBegin(Gl::GL_TRIANGLES)
+              mesh['vertices'].each do |vertice|
+                srand(vertice.hash)
+                shade = rand()
+                Gl.glColor3f(shade, shade, shade)
+                Gl.glVertex3f(vertice['x'], vertice['y'], vertice['z'])
+              end
+            Gl.glEnd()
           end
-          Gl.glEnd()
-        end
         Gl.glPopMatrix()
       end
 

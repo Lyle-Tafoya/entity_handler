@@ -1,8 +1,0 @@
-{
-  "components": [
-    "location",
-    "model_3d",
-    "velocity",
-    "torque"
-  ]
-}

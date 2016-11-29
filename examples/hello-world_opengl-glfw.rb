@@ -5,15 +5,15 @@ require_relative 'systems/physics'
 EntityHandler::System.components_load('components/')
 EntityHandler::System.entities_load('entities/')
 
-graphics_system = EntityHandler::GraphicsOpenGL.new()
+graphics_system = EntityHandler::GraphicsOpenGL.new(width:640, height:480, title:'Hello World')
 graphics_system.models_load('assets/models/')
 
 graphics_system = EntityHandler::Physics.new()
 
 # Create a new entity
-entity_a = EntityHandler::System.entity_create('object_opengl')
-EntityHandler::System.callback_trigger({'type_id'=>'model_update', 'entity_id'=>entity_a, 'model_name'=>'hello_world'})
-EntityHandler::System.callback_trigger({'type_id'=>'torque_apply', 'entity_id'=>entity_a, 'x'=>50, 'y'=>50, 'z'=>50})
+entity_a = EntityHandler::System.entity_create('object_3d')
+EntityHandler::System.callback_trigger({'type_id'=>'scene_update', 'entity_id'=>entity_a, 'model_name'=>'hello_world'})
+EntityHandler::System.callback_trigger({'type_id'=>'torque_apply', 'entity_id'=>entity_a, 'x'=>50, 'y'=>50, 'z'=>0})
 
 # Main Loop
 time = Time.now().to_f()

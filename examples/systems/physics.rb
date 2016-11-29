@@ -7,37 +7,39 @@ module EntityHandler
 
   class Physics < System
 
-    @screen = nil
-
     def initialize()
-      self.components_register(['location', 'torque', 'velocity'])
+      self.components_register(['orientation', 'position', 'torque', 'velocity'])
 
-      System.callback_register('teleport', self.method(:teleport))
+      System.callback_register('position_update', self.method(:position_update))
       System.callback_register('torque_apply', self.method(:torque_apply))
       System.callback_register('time_passed', self.method(:update))
       System.callback_register('velocity_apply', self.method(:velocity_apply))
     end
 
-    def teleport(message)
-      location = @entities[message['entity_id']]['location']
-      location['x'] = message['x']
-      location['y'] = message['y']
-      location['z'] = message['z']
+    def orientation_update(message)
+    end
+
+    def position_update(message)
+      position = @entities[message['entity_id']]['position']
+      position['x'] = message['x']
+      position['y'] = message['y']
+      position['z'] = message['z']
     end
 
     def update(message)
       time_delta = message['time_delta']
       @entities.each do |entity_id, components|
-        location = components['location']
-        torque = components['torque']
+        position = components['position']
         velocity = components['velocity']
+        position['x'] += velocity['x'] * time_delta
+        position['y'] += velocity['y'] * time_delta
+        position['z'] += velocity['z'] * time_delta
 
-        location['x'] += velocity['x'] * time_delta
-        location['y'] += velocity['y'] * time_delta
-        location['z'] += velocity['z'] * time_delta
-        location['pitch'] += torque['pitch'] * time_delta
-        location['roll'] += torque['roll'] * time_delta
-        location['yaw'] += torque['yaw'] * time_delta
+        orientation = components['orientation']
+        torque = components['torque']
+        orientation['pitch'] += torque['pitch'] * time_delta
+        orientation['roll'] += torque['roll'] * time_delta
+        orientation['yaw'] += torque['yaw'] * time_delta
       end
     end
 

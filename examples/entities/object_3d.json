@@ -2,7 +2,8 @@
   "components": [
     "orientation",
     "position",
-    "scene_ncurses",
+    "scene_3d",
+    "torque",
     "velocity"
   ]
 }

@@ -34,7 +34,7 @@ module EntityHandler
       Gl.glViewport(0, 0, width, height)
       Gl.glMatrixMode(Gl::GL_PROJECTION)
       Gl.glLoadIdentity()
-      Glu.gluPerspective(60.0, width/height, 1.0, 20.0)
+      Glu.gluPerspective(60.0, width/height, 1.0, 100.0)
       Gl.glMatrixMode(Gl::GL_MODELVIEW)
       Gl.glLoadIdentity()
       Glu.gluLookAt(0.0, 0.0, 5.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0)
@@ -62,12 +62,12 @@ module EntityHandler
       Gl.glClear(Gl::GL_COLOR_BUFFER_BIT | Gl::GL_DEPTH_BUFFER_BIT)
       @entities.each do |entity_id, components|
         Gl.glPushMatrix()
+          position = components['position']
+          Gl.glTranslatef(position['x'], position['y'], position['z'])
           orientation = components['orientation']
           Gl.glRotatef(orientation['pitch'], 1, 0, 0)
           Gl.glRotatef(orientation['yaw'], 0, 1, 0)
           Gl.glRotatef(orientation['roll'], 0, 0, 1)
-          position = components['position']
-          Gl.glTranslatef(position['x'], position['y'], position['z'])
 
           components['scene_3d']['model_data']['meshes'].each do |mesh|
             Gl.glBegin(Gl::GL_TRIANGLES)
